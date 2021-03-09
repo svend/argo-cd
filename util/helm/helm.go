@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/url"
+	"os"
 	"os/exec"
 	"path"
 	"strings"
@@ -115,6 +116,10 @@ func (h *helm) GetParameters(valuesFiles []string) (map[string]string, error) {
 		if err == nil && (parsedURL.Scheme == "http" || parsedURL.Scheme == "https") {
 			fileValues, err = config.ReadRemoteFile(file)
 		} else {
+			_, err := os.Stat(file)
+			if os.IsNotExist(err) {
+				continue
+			}
 			fileValues, err = ioutil.ReadFile(path.Join(h.cmd.WorkDir, file))
 		}
 		if err != nil {
